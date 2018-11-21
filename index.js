@@ -47,15 +47,20 @@ server.listen(8080, function () {
 
 server.get('/medicoes', function (req, res, next) {
 
-    let { initial_date, final_date } = req.query;
+    let { initial_date, final_date, idColmeia } = req.query;
 
     initial_date = getMysqlDate(initial_date);
     final_date = getMysqlDate(final_date);
 
     console.log("req.query.initial_date:" + initial_date);
     console.log("req.query.final_date:" + final_date);
+    console.log("req.query.idColmeia:" + idColmeia);
 
-    knex('medicao').whereBetween('data', [initial_date, final_date]).then((dados) => {
+    let medicoesPeriodo = knex('medicao').whereBetween('data', [initial_date, final_date]);
+    if(idColmeia > 0) {
+        medicoesPeriodo = medicoesPeriodo.where('idcolmeia', idColmeia);
+    }
+    medicoesPeriodo.then((dados) => {
     //knex('medicao').then((dados) => {
         for (var key in dados) {
             dados[key].data = getDateFromJSON(dados[key].data);
